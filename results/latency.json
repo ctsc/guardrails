@@ -1,0 +1,9 @@
+{
+ "n": 50,
+ "mean_ms": 122.0,
+ "p50_ms": 123.9,
+ "p95_ms": 143.5,
+ "max_ms": 148.2,
+ "gpu_memory": "3107 MiB, 6144 MiB",
+ "processes": "[Insufficient Permissions], [N/A]\nC:\\Windows\\System32\\ShellHost.exe, [N/A]\nC:\\Windows\\SystemApps\\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\\CrossDeviceResume.exe, [N/A]\nC:\\Windows\\SystemApps\\Microsoft.LockApp_cw5n1h2txyewy\\LockApp.exe, [N/A]\nC:\\Program Files\\WindowsApps\\Microsoft.YourPhone_1.26092.119.0_x64__8wekyb3d8bbwe\\PhoneExperienceHost.exe, [N/A]\nC:\\Program Files\\WindowsApps\\AD2F1837.OMENCommandCenter_1101.2609.11.0_x64__v10z8vjag6ke6\\OmenCommandCenterApp\\OmenCommandCenterBackground.exe, [N/A]\nC:\\Users\\carte\\AppData\\Local\\Discord\\app-1.0.9267\\Discord.exe, [N/A]\nC:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\157.0.4341.42\\msedgewebview2.exe, [N/A]\nC:\\Program Files\\WindowsApps\\Claude_4.23118.0.0_x64__pzs8sxrjxfjjc\\app\\claude.exe, [N/A]\nC:\\Program Files\\WindowsApps\\Claude_4.23118.0.0_x64__pzs8sxrjxfjjc\\app\\claude.exe, [N/A]\nC:\\Windows\\System32\\ApplicationFrameHost.exe, [N/A]\nC:\\Windows\\ImmersiveControlPanel\\SystemSettings.exe, [N/A]\nC:\\Users\\carte\\AppData\\Local\\Programs\\Devin\\Devin.exe, [N/A]\nC:\\Program Files\\Docker\\Docker\\frontend\\Docker Desktop.exe, [N/A]\n[Insufficient Permissions], [N/A]\nC:\\Program Files\\Google\\Chrome\\Application\\chrome.exe, [N/A]\nC:\\Program Files\\Google\\Chrome\\Application\\chrome.exe, [N/A]\nC:\\Windows\\explorer.exe, [N/A]\nC:\\Windows\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\StartMenuExperienceHost.exe, [N/A]\nC:\\Windows\\SystemApps\\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\\SearchHost.exe, [N/A]\nC:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\157.0.4341.42\\msedgewebview2.exe, [N/A]\nC:\\llama.cpp\\llama-server.exe, [N/A]"
+}

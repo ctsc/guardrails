@@ -1,0 +1,185 @@
+== loading sources
+Aegis train 30007 test 1964
+Aegis train violated_categories (top 25):
+      9747  ''
+      2850  'Criminal Planning/Confessions'
+      2148  'Needs Caution'
+      1140  'Hate/Identity Hate'
+      1107  'PII/Privacy'
+       835  'Harassment'
+       648  'Violence, Criminal Planning/Confessions'
+       624  'Sexual'
+       590  'Criminal Planning/Confessions, Controlled/Regulated Substances'
+       563  'Profanity'
+       455  'Unauthorized Advice'
+       392  'Violence'
+       374  'Controlled/Regulated Substances'
+       338  'Suicide and Self Harm'
+       299  'Guns and Illegal Weapons, Criminal Planning/Confessions'
+       288  'Hate/Identity Hate, Harassment'
+       215  'Criminal Planning/Confessions, Violence'
+       181  'Criminal Planning/Confessions, Needs Caution'
+       178  'Hate/Identity Hate, Criminal Planning/Confessions'
+       157  'Guns and Illegal Weapons'
+       155  'Political/Misinformation/Conspiracy'
+       154  'Suicide and Self Harm, Profanity'
+       152  'Controlled/Regulated Substances, Criminal Planning/Confessions'
+       149  'Sexual, Profanity'
+       135  'Criminal Planning/Confessions, Other'
+WildGuardMix train 86759
+WildGuardMix subcategory x adversarial x prompt_harm_label:
+     20389  ('benign', True, 'unharmful')
+     20154  ('benign', False, 'unharmful')
+      7100  ('others', True, 'harmful')
+      3627  ('others', False, 'harmful')
+      3178  ('social_stereotypes_and_unfair_discrimination', False, 'harmful')
+      3165  ('social_stereotypes_and_unfair_discrimination', True, 'harmful')
+      2647  ('disseminating_false_or_misleading_information_encouraging_disinformation_campaigns', False, 'harmful')
+      2121  ('violence_and_physical_harm', False, 'harmful')
+      1964  ('toxic_language_hate_speech', False, 'harmful')
+      1801  ('sensitive_information_organization_government', False, 'harmful')
+      1712  ('sexual_content', False, 'harmful')
+      1658  ('defamation_encouraging_unethical_or_unsafe_actions', False, 'harmful')
+      1527  ('private_information_individual', True, 'harmful')
+      1507  ('copyright_violations', False, 'harmful')
+      1437  ('disseminating_false_or_misleading_information_encouraging_disinformation_campaigns', True, 'harmful')
+      1284  ('sensitive_information_organization_government', True, 'harmful')
+      1231  ('mental_health_over-reliance_crisis', False, 'harmful')
+      1164  ('fraud_assisting_illegal_activities', False, 'harmful')
+      1149  ('cyberattack', False, 'harmful')
+      1116  ('fraud_assisting_illegal_activities', True, 'harmful')
+      1056  ('toxic_language_hate_speech', True, 'harmful')
+      1008  ('private_information_individual', False, 'harmful')
+       882  ('causing_material_harm_by_disseminating_misinformation', False, 'harmful')
+       780  ('violence_and_physical_harm', True, 'harmful')
+       762  ('defamation_encouraging_unethical_or_unsafe_actions', True, 'harmful')
+       600  ('causing_material_harm_by_disseminating_misinformation', True, 'harmful')
+       582  ('mental_health_over-reliance_crisis', True, 'harmful')
+       450  ('cyberattack', True, 'harmful')
+       444  ('sexual_content', True, 'harmful')
+       264  ('copyright_violations', True, 'harmful')
+Aegis usable prompts per letter: {'B': 1295, 'C': 1022, 'D': 829, 'E': 536, 'F': 5358} safe: 8282
+Aegis usable unsafe responses per letter: {'B': 324, 'C': 218, 'D': 233, 'E': 112, 'F': 1055} safe: 10832
+WildGuardMix adversarial benign 19787 adversarial harmful 19723 plain harmful per letter {'B': 5139, 'D': 1712, 'E': 2121, 'F': 2313}
+streaming google/civil_comments for insults ...
+civil_comments scanned 69230 rows, 600 insult candidates
+== building train
+  A aegis safe prompts                                    want 1000  have   8006  took 1000
+  A or-bench-80k                                          want 1000  have  80359  took 1000
+  A wildguardmix adversarial benign                       want  700  have  11099  took  700
+  A safe-guard-prompt-injection label 0                   want  250  have   5451  took  250
+  A aegis safe responses                                  want  250  have   8150  took  250
+  B aegis Hate/Identity Hate prompts                      want  250  have    778  took  250
+  B aegis hate responses                                  want   50  have    324  took   50
+  B wildguardmix hate/stereotype                          want  100  have   2459  took  100
+  C civil_comments insult>=0.8                            want  300  have    597  took  300
+  C aegis Harassment prompts                              want  100  have    634  took  100
+  D aegis Sexual prompts                                  want  250  have    494  took  250
+  D aegis sexual responses                                want   50  have    230  took   50
+  D wildguardmix sexual                                   want  100  have    636  took  100
+  E aegis Violence prompts                                want  250  have    348  took  250
+  E aegis violence responses                              want   50  have    112  took   50
+  E wildguardmix violence                                 want  100  have    845  took  100
+  F aegis Criminal/Guns/Substances/Fraud prompts          want  250  have   3902  took  250
+  F aegis misconduct responses                            want   50  have   1051  took   50
+  F wildguardmix fraud/illegal/cyberattack                want  100  have    961  took  100
+  G wildguardmix adversarial harmful                      want  150  have  10869  took  150
+  G jackhhao jailbreak                                    want  100  have    289  took  100
+  G safe-guard-prompt-injection label 1                   want  100  have   2180  took  100
+  G gandalf train                                         want   50  have    775  took   50
+== building test sets
+prompt-injections-benchmark split ['test'] cols ['text', 'label'] label values [('benign', 2997), ('jailbreak', 2003)]
+  TEST pib jailbreak                                      want  200  have   1838  took  200
+  TEST pib benign                                         want  300  have   2877  took  300
+  openai moderation rows 1521 (78 multi-label, scored correct if prediction in valid_labels)
+  Aegis test pool per letter: {'A': 1056, 'B': 122, 'C': 82, 'D': 80, 'E': 42, 'F': 491}
+  Aegis test picked: {'A': 89, 'B': 68, 'C': 66, 'D': 66, 'E': 42, 'F': 69}
+  TEST XSTest safe                                        want  250  have    250  took  250
+  TEST JBB benign                                         want  100  have    100  took  100
+  TEST safe-guard label 1                                 want  100  have    604  took  100
+  TEST safe-guard label 0                                 want  100  have   1348  took  100
+== dedup
+  dropped 20 training rows that collide with a test row
+  dropped 11 duplicate test rows
+== counts
+{
+  "train_total": 5580,
+  "train_per_label": {
+    "A": 3196,
+    "B": 397,
+    "C": 399,
+    "D": 397,
+    "E": 398,
+    "F": 400,
+    "G": 393
+  },
+  "train_per_kind": {
+    "input": 5130,
+    "output": 450
+  },
+  "train_per_source": {
+    "aegis Criminal/Guns/Substances/Fraud prompts": 250,
+    "aegis Harassment prompts": 99,
+    "aegis Hate/Identity Hate prompts": 247,
+    "aegis Sexual prompts": 247,
+    "aegis Violence prompts": 248,
+    "aegis hate responses": 50,
+    "aegis misconduct responses": 50,
+    "aegis safe prompts": 998,
+    "aegis safe responses": 250,
+    "aegis sexual responses": 50,
+    "aegis violence responses": 50,
+    "civil_comments insult>=0.8": 300,
+    "gandalf train": 49,
+    "jackhhao jailbreak": 94,
+    "or-bench-80k": 1000,
+    "safe-guard-prompt-injection label 0": 250,
+    "safe-guard-prompt-injection label 1": 100,
+    "wildguardmix adversarial benign": 698,
+    "wildguardmix adversarial harmful": 150,
+    "wildguardmix fraud/illegal/cyberattack": 100,
+    "wildguardmix hate/stereotype": 100,
+    "wildguardmix sexual": 100,
+    "wildguardmix violence": 100
+  },
+  "test_total": 2960,
+  "test_per_set": {
+    "aegis_test": 399,
+    "openai_moderation": 1511,
+    "overblock_jbb": 100,
+    "overblock_xstest": 250,
+    "prompt_attack_pib": 500,
+    "safeguard_test_secondary": 200
+  },
+  "test_per_set_label": {
+    "aegis_test": {
+      "A": 89,
+      "B": 67,
+      "C": 66,
+      "D": 66,
+      "E": 42,
+      "F": 69
+    },
+    "openai_moderation": {
+      "A": 1054,
+      "B": 159,
+      "C": 32,
+      "D": 175,
+      "E": 91
+    },
+    "overblock_jbb": {
+      "A": 100
+    },
+    "overblock_xstest": {
+      "A": 250
+    },
+    "prompt_attack_pib": {
+      "A": 300,
+      "G": 200
+    },
+    "safeguard_test_secondary": {
+      "A": 100,
+      "G": 100
+    }
+  }
+}

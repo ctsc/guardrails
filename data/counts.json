@@ -1,0 +1,81 @@
+{
+  "train_total": 5580,
+  "train_per_label": {
+    "A": 3196,
+    "B": 397,
+    "C": 399,
+    "D": 397,
+    "E": 398,
+    "F": 400,
+    "G": 393
+  },
+  "train_per_kind": {
+    "input": 5130,
+    "output": 450
+  },
+  "train_per_source": {
+    "aegis Criminal/Guns/Substances/Fraud prompts": 250,
+    "aegis Harassment prompts": 99,
+    "aegis Hate/Identity Hate prompts": 247,
+    "aegis Sexual prompts": 247,
+    "aegis Violence prompts": 248,
+    "aegis hate responses": 50,
+    "aegis misconduct responses": 50,
+    "aegis safe prompts": 998,
+    "aegis safe responses": 250,
+    "aegis sexual responses": 50,
+    "aegis violence responses": 50,
+    "civil_comments insult>=0.8": 300,
+    "gandalf train": 49,
+    "jackhhao jailbreak": 94,
+    "or-bench-80k": 1000,
+    "safe-guard-prompt-injection label 0": 250,
+    "safe-guard-prompt-injection label 1": 100,
+    "wildguardmix adversarial benign": 698,
+    "wildguardmix adversarial harmful": 150,
+    "wildguardmix fraud/illegal/cyberattack": 100,
+    "wildguardmix hate/stereotype": 100,
+    "wildguardmix sexual": 100,
+    "wildguardmix violence": 100
+  },
+  "test_total": 2960,
+  "test_per_set": {
+    "aegis_test": 399,
+    "openai_moderation": 1511,
+    "overblock_jbb": 100,
+    "overblock_xstest": 250,
+    "prompt_attack_pib": 500,
+    "safeguard_test_secondary": 200
+  },
+  "test_per_set_label": {
+    "aegis_test": {
+      "A": 89,
+      "B": 67,
+      "C": 66,
+      "D": 66,
+      "E": 42,
+      "F": 69
+    },
+    "openai_moderation": {
+      "A": 1054,
+      "B": 159,
+      "C": 32,
+      "D": 175,
+      "E": 91
+    },
+    "overblock_jbb": {
+      "A": 100
+    },
+    "overblock_xstest": {
+      "A": 250
+    },
+    "prompt_attack_pib": {
+      "A": 300,
+      "G": 200
+    },
+    "safeguard_test_secondary": {
+      "A": 100,
+      "G": 100
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "title": "guardrails-train-test",
+  "id": "cartertierney/guardrails-train-test",
+  "licenses": [{"name": "CC-BY-SA-4.0"}],
+  "description": "Private train/test split for a 7-way guardrail classifier (A safe, B hate, C insults, D sexual, E violence, F misconduct, G prompt attack). Built by build_dataset.py from Aegis 2.0, WildGuardMix, OR-Bench, civil_comments, deepset, jackhhao, Gandalf (train) and prompt-injections-benchmark, OpenAI moderation eval, Aegis test, XSTest, JailbreakBench, deepset test (test)."
+}

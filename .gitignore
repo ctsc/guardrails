@@ -1,0 +1,28 @@
+# secrets - never commit
+kaggle.md
+.env
+*.token
+access_token
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# data + models (large; regenerate with build_dataset.py / download from Kaggle via fetch_outputs.cmd)
+data/*.jsonl
+data/cache/
+*.gguf
+models/adapter/
+models/v1/
+hf_cache/
+
+# kaggle
+kaggle_dataset/*.jsonl
+kaggle_kernel/output/
+
+# misc
+*.log
+.gradio/
+phase*_files.zip

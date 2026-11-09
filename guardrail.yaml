@@ -1,0 +1,41 @@
+# Guardrail policy. Mirrors the AWS Bedrock Guardrails content-policy shape:
+# each filter has a strength (LOW / MEDIUM / HIGH) that decides which model-confidence levels get blocked.
+#   strength HIGH   blocks LOW, MEDIUM and HIGH confidence detections (most aggressive)
+#   strength MEDIUM blocks MEDIUM and HIGH
+#   strength LOW    blocks HIGH only
+#   strength NONE   never blocks (filter is reported but not enforced)
+model:
+  server_url: http://127.0.0.1:8080        # llama-server
+  prompt_template: results/prompt_template.txt   # written by train.ipynb; exact prompt the model was trained on
+  timeout_s: 30
+
+# probability of the winning non-safe letter -> confidence label
+confidence:
+  HIGH: 0.85
+  MEDIUM: 0.60
+  LOW: 0.35      # below this the text is treated as safe even if a non-safe letter wins
+
+content_policy:
+  filters:
+    HATE:          {letter: B, input_strength: HIGH,   output_strength: HIGH}
+    INSULTS:       {letter: C, input_strength: MEDIUM, output_strength: MEDIUM}
+    SEXUAL:        {letter: D, input_strength: HIGH,   output_strength: HIGH}
+    VIOLENCE:      {letter: E, input_strength: HIGH,   output_strength: HIGH}
+    MISCONDUCT:    {letter: F, input_strength: HIGH,   output_strength: HIGH}
+    PROMPT_ATTACK: {letter: G, input_strength: HIGH,   output_strength: NONE}   # AWS: prompt attacks are input-only
+
+sensitive_information_policy:
+  pii_entities:                 # action ANONYMIZE replaces the span with [TYPE]; BLOCK blocks the whole request
+    EMAIL: ANONYMIZE
+    PHONE: ANONYMIZE
+    SSN: BLOCK
+    CREDIT_CARD: BLOCK
+    IP_ADDRESS: ANONYMIZE
+    URL: NONE
+
+blocked_input_message: "Sorry, I can't help with that request."
+blocked_output_message: "Sorry, the model's response was blocked by the guardrail."
+
+chat:
+  upstream_url: http://127.0.0.1:8080/v1/chat/completions   # any OpenAI-compatible endpoint; defaults to the same llama-server
+  max_tokens: 200
