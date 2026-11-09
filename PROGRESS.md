@@ -133,3 +133,6 @@ Carter asked which of the "an interviewer will call this out" items could be fix
 - **Baseline, Llama Guard 3 1B (Meta), same 2,960 rows, binary flag/safe:** all input rows flag recall 87.7% ours vs 68.8% Llama Guard, FPR 31.7% vs 18.0%; prompt-injection benchmark recall 70.5% vs 60.0% (Llama Guard has no prompt-attack class); XSTest over-blocking 23.6% vs 7.2%.
 - Throughput on the laptop, 4 concurrent clients, n=40: **1.49 req/s**, mean 2623.1 ms, p95 4414.0 ms per request
 <!-- /FIXES_PROGRESS -->
+- Caveat: the throughput run happened minutes after the laptop was unplugged (GPU throttled on battery); the single-request figure on AC was 394 ms, so the req/s above is a lower bound. Re-measure plugged in.
+- First Llama Guard attempt failed with HTTP 400: `-c 2048 --parallel 4` gives each slot only 512 tokens, too small for Llama Guard's ~250-token prompt + text. Fixed with `-c 8192`. Its eval took 814 s (2,960 rows, 4 slots, 1660 Ti).
+- The first run of `run_fixes.cmd` also pushed docs with a stale demo table because the API restart failed (uvicorn killed, scheduled task did not relaunch it); fixed by starting uvicorn directly when the task does not come up.

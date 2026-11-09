@@ -97,7 +97,7 @@ On the GTX 1660 Ti Max-Q laptop (6 GB) used for the live demo, same Q8_0 model: 
 6/6 right.
 <!-- /DEMO_TABLE -->
 
-Rows marked WRONG are the deliberate misses shown in the demo. The plain base64 injection was a miss in the first version; it is now caught because the decoded payload is classified too (`decodedPayloads` in the response). Leetspeak / other obfuscations are still a miss unless the model happens to generalise, which is the point of the demo: a classifier is one layer of the defense, not the whole defense.
+The base64 injection was a miss in the first version of this table; it is caught now because the decoded payload is classified too (`decodedPayloads` in the response). The leetspeak row was added as the next candidate miss and the model caught it as well, so the table is 6/6. The expected failure mode is obfuscation the model has never seen (ROT13, reversed text, other languages, instructions split across turns); none of those are in the training data, and that is the point: a classifier is one layer of the defense, not the whole defense.
 
 ### Baseline: Llama Guard 3 1B on the same test set
 
@@ -117,6 +117,8 @@ Meta's released 1B guardrail model, run through the same llama.cpp server (`eval
 
 Llama Guard 3 1B took 813.9 s for 2,960 rows on the GTX 1660 Ti (4 parallel slots). Its 7-way accuracy is in `results/eval_llamaguard.md` but is not comparable (no insults / prompt-attack classes).
 <!-- /LG_TABLE -->
+
+Binary flagged accuracy (safe vs flagged, all input rows): ours 74.9% vs Llama Guard 77.5%; Aegis 82.5% vs 58.4%; prompt-injection benchmark 84.4% vs 76.6%; OpenAI moderation 68.7% vs 77.7%. The two sit at different operating points: ours trades false positives for recall (and covers insults + prompt attacks, which Llama Guard does not model); Llama Guard is the conservative one. A threshold sweep on P(unsafe) that puts both at the same FPR is the fair next comparison. Caveat on the Llama Guard run: every row was fed as a single user turn (model-output rows included) and llama-server added a second BOS token in front of the prompt; both may cost it a little.
 
 Example:
 
@@ -142,7 +144,7 @@ curl -X POST http://127.0.0.1:8000/guardrail/apply -H "Content-Type: application
 - PII is regex: 9 formats (email, phone, SSN, card, IP, URL, US street address, date of birth, AWS key), not free-form names or non-US addresses. AWS covers ~30 entity types with NER.
 - No denied topics, word lists, or grounding checks.
 - Obfuscated prompt attacks (leetspeak, ROT13, other languages) are only caught if the model generalises; base64 and URL-encoding are handled by decode-and-rescan. The demo shows a deliberate miss.
-- Latency is one 2B forward pass per message (~200-token prompt header; more for long texts or decoded payloads). Measured single-request and with 4 concurrent clients (`results/throughput_laptop.json`); fine for chat, not for high-throughput batch moderation.
+- Latency is one 2B forward pass per message (~200-token prompt header; more for long texts or decoded payloads). Measured single-request (394 ms on the laptop, 122 ms on the desktop) and with 4 concurrent clients (`results/throughput_laptop.json`: 1.5 req/s, but that run happened on battery with a throttled GPU, so treat it as a lower bound); fine for chat, not for high-throughput batch moderation.
 
 ## Dataset licenses
 
