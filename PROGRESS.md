@@ -129,5 +129,7 @@ Carter asked which of the "an interviewer will call this out" items could be fix
 - [x] README / SLIDES: limitations now also list no validation split (model selected on test), single external baseline, possible benchmark contamination, single-turn/no context, thin output-side data, uncalibrated thresholds.
 - [x] `run_fixes.cmd` runs all of the above on the laptop in one go (tests, API restart, Llama Guard download + eval, demo, throughput, `fill_docs.py`, commit + push) because the Devin Desktop link to the laptop kept dropping on campus Wi-Fi.
 <!-- FIXES_PROGRESS -->
-- Demo after fixes: 4/5 right; SAFE -> SAFE (RIGHT); HATE -> HATE (RIGHT); PII -> PII (RIGHT); PROMPT_ATTACK -> PROMPT_ATTACK (RIGHT); PROMPT_ATTACK -> SAFE (WRONG)
+- Demo after fixes: 6/6 right; SAFE -> SAFE (RIGHT); HATE -> HATE (RIGHT); PII -> PII (RIGHT); PROMPT_ATTACK -> PROMPT_ATTACK (RIGHT); PROMPT_ATTACK -> PROMPT_ATTACK (RIGHT); PROMPT_ATTACK -> PROMPT_ATTACK (RIGHT)
+- **Baseline, Llama Guard 3 1B (Meta), same 2,960 rows, binary flag/safe:** all input rows flag recall 87.7% ours vs 68.8% Llama Guard, FPR 31.7% vs 18.0%; prompt-injection benchmark recall 70.5% vs 60.0% (Llama Guard has no prompt-attack class); XSTest over-blocking 23.6% vs 7.2%.
+- Throughput on the laptop, 4 concurrent clients, n=40: **1.49 req/s**, mean 2623.1 ms, p95 4414.0 ms per request
 <!-- /FIXES_PROGRESS -->

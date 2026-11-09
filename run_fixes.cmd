@@ -18,8 +18,14 @@ if errorlevel 1 (
 )
 taskkill /f /im uvicorn.exe >nul 2>&1
 powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*uvicorn*api:app*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }"
-schtasks /run /tn GuardrailsApi >nul 2>&1 || start "api" /min cmd /c start_api.cmd
-powershell -NoProfile -Command "for ($i=0; $i -lt 30; $i++) { Start-Sleep 1; try { $h = (Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8000/healthz).Content; Write-Host '   ' $h; break } catch {} }"
+schtasks /run /tn GuardrailsApi >nul 2>&1
+powershell -NoProfile -Command "for ($i=0; $i -lt 15; $i++) { Start-Sleep 1; try { Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8000/healthz | Out-Null; exit 0 } catch {} }; exit 1"
+if errorlevel 1 (
+  echo    scheduled task did not bring the API up, starting uvicorn directly
+  start "api" /min cmd /c ".venv\Scripts\uvicorn api:app --port 8000 > logs\api.log 2>&1"
+  powershell -NoProfile -Command "for ($i=0; $i -lt 30; $i++) { Start-Sleep 1; try { Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8000/healthz | Out-Null; exit 0 } catch {} }; Write-Host '!! API did not start, see logs\api.log'; Get-Content logs\api.log -Tail 20; exit 1"
+)
+powershell -NoProfile -Command "try { Write-Host '   ' (Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8000/healthz).Content } catch { Write-Host '   API DOWN' }"
 echo    warm-up request
 powershell -NoProfile -Command "try { Invoke-RestMethod -Method Post http://127.0.0.1:8000/guardrail/apply -ContentType 'application/json' -Body '{\"source\":\"INPUT\",\"content\":[{\"text\":{\"text\":\"hello there\"}}]}' | Out-Null } catch { Write-Host $_ }"
 
@@ -46,7 +52,7 @@ echo [8/8] commit + push
 git add -- api.py decode.py pii.py scorer.py guardrail.yaml demo_prompts.txt demo.py eval_llamaguard.py run_llamaguard_eval.ps1 throughput.py fill_docs.py run_fixes.cmd dl_llamaguard.cmd tests README.md SLIDES.md PROGRESS.md results/demo_table.json
 if exist results\eval_llamaguard.json git add -- results/eval_llamaguard.json results/eval_llamaguard.md
 if exist results\throughput_laptop.json git add -- results/throughput_laptop.json
-git commit -m "Decode-and-rescan for encoded payloads, windowed scoring for long inputs, 3 more PII types, Llama Guard 3 1B baseline, throughput; limitations updated"
+git commit -m "Llama Guard 3 1B baseline results, post-fix demo table, laptop throughput"
 git push origin main
 echo.
 echo ===== DONE. Tell Devin "run_fixes done" (paste the Llama Guard table above if the link is still flaky). =====

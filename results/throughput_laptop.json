@@ -1,0 +1,9 @@
+{
+ "n": 40,
+ "concurrent_clients": 4,
+ "requests_per_s": 1.49,
+ "wall_s": 26.8,
+ "mean_ms": 2623.1,
+ "p50_ms": 2428.7,
+ "p95_ms": 4414.0
+}
