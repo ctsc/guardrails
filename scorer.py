@@ -48,13 +48,28 @@ def load_template(cfg: dict) -> str:
 
 
 class Scorer:
-    def __init__(self, cfg: dict | None = None, max_chars: int = 1500):
+    def __init__(self, cfg: dict | None = None, max_chars: int = 1500, stride: int = 1000):
         self.cfg = cfg or load_config()
         self.url = self.cfg["model"]["server_url"].rstrip("/")
         self.timeout = self.cfg["model"].get("timeout_s", 30)
         self.template = load_template(self.cfg)
         self.max_chars = max_chars
+        self.stride = stride
+        self.max_windows = int(self.cfg["model"].get("max_windows", 8))
         assert SENTINEL in self.template, "prompt template is missing the text sentinel"
+
+    def windows(self, text: str) -> list[str]:
+        """Overlapping windows so an attack at the end of a long prompt is not truncated away."""
+        text = text.strip()
+        if len(text) <= self.max_chars:
+            return [text]
+        starts = list(range(0, max(1, len(text) - self.max_chars) + 1, self.stride))
+        if starts[-1] + self.max_chars < len(text):
+            starts.append(len(text) - self.max_chars)
+        if len(starts) > self.max_windows:  # keep head, tail and evenly spaced middle windows
+            idx = sorted({round(i * (len(starts) - 1) / (self.max_windows - 1)) for i in range(self.max_windows)})
+            starts = [starts[i] for i in idx]
+        return [text[s : s + self.max_chars] for s in starts]
 
     def build_prompt(self, text: str) -> str:
         text = text.strip()
@@ -62,17 +77,23 @@ class Scorer:
             text = text[: self.max_chars] + " ..."
         return self.template.replace(SENTINEL, text)
 
-    def score(self, text: str) -> dict:
-        t0 = time.perf_counter()
+    def score_once(self, text: str) -> dict[str, float]:
         r = requests.post(
             f"{self.url}/completion",
             json={"prompt": self.build_prompt(text), "n_predict": 1, "n_probs": 20, "temperature": 0, "cache_prompt": True},
             timeout=self.timeout,
         )
         r.raise_for_status()
-        probs = parse_letter_probs(r.json())
+        return parse_letter_probs(r.json())
+
+    def score(self, text: str) -> dict:
+        """Score every window and keep the one with the most non-safe mass (one call for texts under max_chars)."""
+        t0 = time.perf_counter()
+        wins = self.windows(text)
+        probs = max((self.score_once(w) for w in wins), key=lambda p: 1.0 - p["A"])
         top = max(probs, key=probs.get)
-        return {"probs": probs, "top": top, "top_name": NAMES[top], "latency_ms": round((time.perf_counter() - t0) * 1000, 1)}
+        return {"probs": probs, "top": top, "top_name": NAMES[top], "windows": len(wins),
+                "latency_ms": round((time.perf_counter() - t0) * 1000, 1)}
 
     def healthy(self) -> bool:
         try:

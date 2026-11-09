@@ -22,3 +22,13 @@ def test_plain_text_untouched():
 def test_types_filter():
     masked, ents = pii.mask("a@b.co 555-123-4567", types=["EMAIL"])
     assert [e["type"] for e in ents] == ["EMAIL"] and "555-123-4567" in masked
+
+
+def test_new_entity_types():
+    text = ("I live at 1600 Pennsylvania Avenue NW, Apt 4, my DOB is 03/14/1999, born March 14, 1999, "
+            "key AKIAIOSFODNN7EXAMPLE, and the meeting is on 12/01/2025.")
+    masked, ents = pii.mask(text)
+    types = [e["type"] for e in ents]
+    assert "US_ADDRESS" in types and types.count("DATE_OF_BIRTH") == 2 and "AWS_ACCESS_KEY" in types
+    assert "12/01/2025" in masked  # a plain date is not PII
+    assert "my DOB is [DATE_OF_BIRTH]" in masked  # only the date is masked, not the words around it

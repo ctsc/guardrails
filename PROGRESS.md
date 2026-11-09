@@ -118,3 +118,16 @@ Python: `.venv` built with `py -3.12` (3.12.9) on the desktop, 3.11 on the lapto
 
 ## Known issues
 - Devin Desktop's link to the machine drops every few minutes (seconds, on campus Wi-Fi); long jobs are run as scheduled tasks (`setup_laptop.cmd`, `run_server_bg.cmd`) that log to `logs\`.
+
+## Post-review fixes (interview day)
+Carter asked which of the "an interviewer will call this out" items could be fixed without retraining. Done:
+- [x] `scorer.py`: long texts (>1,500 chars) scored in overlapping windows, worst window wins (was: silently truncated, attack at the end never seen). Test added.
+- [x] `decode.py` + `api.py`: decode-and-rescan for base64 / URL-encoded payloads; worst variant wins; `decodedPayloads` added to the assessment. Tests added. Turns the base64 demo miss into a hit; `demo_prompts.txt` gained a leetspeak row as the new candidate miss.
+- [x] `pii.py`: + US street address, date of birth (only the date is masked, and only when introduced as a birth date), AWS access key (BLOCK). 9 types now. Tests added.
+- [x] `eval_llamaguard.py` + `run_llamaguard_eval.ps1`: Llama Guard 3 1B (Q8_0 GGUF, ungated QuantFactory build) on the same 2,960 test rows via a second llama-server on :8081, 4 parallel slots. Binary flag/safe comparison in README.
+- [x] `throughput.py`: 4 concurrent clients against the API (`results/throughput_laptop.json`).
+- [x] README / SLIDES: limitations now also list no validation split (model selected on test), single external baseline, possible benchmark contamination, single-turn/no context, thin output-side data, uncalibrated thresholds.
+- [x] `run_fixes.cmd` runs all of the above on the laptop in one go (tests, API restart, Llama Guard download + eval, demo, throughput, `fill_docs.py`, commit + push) because the Devin Desktop link to the laptop kept dropping on campus Wi-Fi.
+<!-- FIXES_PROGRESS -->
+- Demo after fixes: 4/5 right; SAFE -> SAFE (RIGHT); HATE -> HATE (RIGHT); PII -> PII (RIGHT); PROMPT_ATTACK -> PROMPT_ATTACK (RIGHT); PROMPT_ATTACK -> SAFE (WRONG)
+<!-- /FIXES_PROGRESS -->

@@ -16,6 +16,7 @@ import requests
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+import decode
 import pii
 from scorer import LETTERS, Scorer, load_config
 
@@ -77,9 +78,17 @@ def apply_guardrail(text: str, source: str = "INPUT", probs: dict[str, float] | 
             pii_block = True
             reasons.append(f"PII {e['type']} blocked")
 
-    # 2) model: one forward pass, read letter probabilities
+    # 2) model: one forward pass per text variant, read letter probabilities. Variants = the text itself plus any
+    #    base64 / URL-encoded payload it carries (decode-and-rescan), so an encoded injection is judged in the clear.
+    decoded = decode.decoded_payloads(masked) if CFG.get("decode_and_rescan", True) else []
     if probs is None:
-        probs = get_scorer().score(masked if source == "INPUT" else "Model output: " + masked)["probs"]
+        prefix = "" if source == "INPUT" else "Model output: "
+        scored = [get_scorer().score(prefix + v)["probs"] for v in [masked, *decoded]]
+        probs = max(scored, key=lambda p: 1.0 - p["A"])
+        if decoded:
+            reasons_decoded = max(scored[1:], key=lambda p: 1.0 - p["A"])
+            if reasons_decoded is probs and probs["A"] < 0.5:
+                reasons.append("detected in decoded payload")
     filters = []
     content_block = False
     strength_key = "input_strength" if source == "INPUT" else "output_strength"
@@ -114,6 +123,7 @@ def apply_guardrail(text: str, source: str = "INPUT", probs: dict[str, float] | 
             "sensitiveInformationPolicy": {"piiEntities": pii_entities},
             "invocationMetrics": {"guardrailProcessingLatency": latency_ms},
             "scores": {L: round(probs[L], 4) for L in LETTERS},
+            "decodedPayloads": decoded,
         }],
         "blocked": pii_block or content_block,
     }

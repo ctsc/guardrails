@@ -8,6 +8,7 @@ model:
   server_url: http://127.0.0.1:8080        # llama-server
   prompt_template: results/prompt_template.txt   # written by train.ipynb; exact prompt the model was trained on
   timeout_s: 30
+  max_windows: 8      # long texts are scored in overlapping 1,500-char windows; worst window wins
 
 # probability of the winning non-safe letter -> confidence label
 confidence:
@@ -32,6 +33,12 @@ sensitive_information_policy:
     CREDIT_CARD: BLOCK
     IP_ADDRESS: ANONYMIZE
     URL: NONE
+    US_ADDRESS: ANONYMIZE
+    DATE_OF_BIRTH: ANONYMIZE
+    AWS_ACCESS_KEY: BLOCK
+
+# base64 / URL-encoded payloads inside a message are decoded and classified too (worst variant wins)
+decode_and_rescan: true
 
 blocked_input_message: "Sorry, I can't help with that request."
 blocked_output_message: "Sorry, the model's response was blocked by the guardrail."

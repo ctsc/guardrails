@@ -1,4 +1,4 @@
-"""Send the 5 demo prompts to the running API and print a right/wrong table (Phase 3 [YOU] check)."""
+"""Send the demo prompts to the running API and print a right/wrong table (Phase 3 [YOU] check)."""
 import json, sys, requests
 
 API = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8000"
