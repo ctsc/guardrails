@@ -1,0 +1,9 @@
+{
+ "n": 50,
+ "mean_ms": 393.9,
+ "p50_ms": 382.2,
+ "p95_ms": 462.4,
+ "max_ms": 466.9,
+ "gpu_memory": "2157 MiB, 6144 MiB",
+ "processes": "C:\\llama.cpp\\llama-server.exe, [N/A]"
+}

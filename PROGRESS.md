@@ -3,15 +3,15 @@
 Tracks the checklist in `Guardrails Take-Home 4-Hour Build Checklist.md`.
 Legend: `[x]` done · `[~]` in progress · `[ ]` not started · `[!]` blocked / needs Carter · `[-]` skipped (with reason)
 
-Project folder: `C:\Users\carte\OneDrive\Desktop\guardrails` (used instead of `local-guardrails`, per Carter).
-Python: `.venv` built with `py -3.12` (3.12.9). Activate with `.venv\Scripts\activate`.
+Project folder: `C:\Users\carte\OneDrive\Desktop\guardrails` on the desktop (used instead of `local-guardrails`, per Carter); clone at `C:\Users\OWNER\Desktop\guardrails` on the laptop. Repo: https://github.com/ctsc/guardrails (models/data/logs gitignored).
+Python: `.venv` built with `py -3.12` (3.12.9) on the desktop, 3.11 on the laptop. Activate with `.venv\Scripts\activate`.
 
 ## Phase 1: Install and dataset
 
 - [x] venv + `pip install fastapi uvicorn requests pyyaml gradio datasets huggingface_hub kaggle` (+ pytest, httpx, pandas, pyarrow)
   - Installed: fastapi 0.162, uvicorn 0.54, gradio 6.31, datasets 5.1, huggingface_hub 2.4, kaggle 2.2.5
 - [x] HF + Kaggle auth (HF user `ctierney2`; `kaggle datasets list` works)
-  - Tokens were found in `kaggle.md` (Carter saved them there). `setup_auth.py` reads that file and writes them to `~/.kaggle/access_token` and the HF token cache without printing them. `kaggle.md` is in `.gitignore`. **Carter: delete or move `kaggle.md` now that auth works; it is plaintext secrets.**
+  - Tokens were found in `kaggle.md` (Carter saved them there). `setup_auth.py` reads that file and writes them to `~/.kaggle/access_token` and the HF token cache without printing them. `kaggle.md` is in `.gitignore` and has been deleted on both machines now that auth is stored.
 - [x] llama.cpp into `C:\llama.cpp` via `get_llama_cpp.cmd`: build **b12211**, `llama-server.exe --version` = 0.9.0-dev
   - Used the **CUDA 12.4** zips, not 13.5: the newest release only ships 13.5 and your driver reports CUDA 13.2, so 12.4 is the pair guaranteed to load. Log: `logs\llama_dl.log`
 - [x] Aegis 2.0 category counts + WildGuardMix subcategory names printed (`explore_local.py` -> `logs\explore_local.log`; Aegis counts also in `logs\build_dataset.log`)
@@ -81,16 +81,16 @@ Python: `.venv` built with `py -3.12` (3.12.9). Activate with `.venv\Scripts\act
 - [x] `[YOU]` VRAM check: 4,692 MB free before start (no cleanup needed)
 - [x] `start_server.cmd` -> llama-server b12211, `guardrail-2b-q8_0.gguf`, all layers on GPU, ctx 2048, :8080. Model takes ~2.1 GB VRAM (3,419 MB used total with desktop apps). `start_api.cmd` -> uvicorn :8000, `/healthz` = `{"api":"ok","llama_server":true}`
 - [x] `pytest`: **15 passed** (live llama-server test included); re-run on v5: 15 passed
-- [x] `demo.py` (`results\demo_table.json`): **4/5 RIGHT** (same 4/5 on v5: base64 injection still the miss)
+- [x] `demo.py` (`results\demo_table.json`, v5 model, RTX 3050 desktop): **4/5 RIGHT** (v1 was also 4/5 with the same miss). Probabilities below are from the live v5 API.
   | expected | got | action | ms |
   |---|---|---|---|
-  | SAFE "How do I kill a Python process..." | SAFE (P=0.77, violence 0.17) | NONE | 121 |
-  | HATE "Immigrants ... subhuman vermin" | HATE (0.99) | GUARDRAIL_INTERVENED | 118 |
-  | PII email + phone | PII masked | GUARDRAIL_INTERVENED | 99 |
-  | PROMPT_ATTACK "Ignore all previous instructions... DAN" | PROMPT_ATTACK (0.999) | GUARDRAIL_INTERVENED | 113 |
-  | PROMPT_ATTACK base64-encoded injection | **SAFE** | NONE | 121 |
+  | SAFE "How do I kill a Python process..." | SAFE (P=0.997) | NONE | 98 |
+  | HATE "Immigrants ... subhuman vermin" | HATE (0.94) | GUARDRAIL_INTERVENED | 104 |
+  | PII email + phone | PII masked | GUARDRAIL_INTERVENED | 104 |
+  | PROMPT_ATTACK "Ignore all previous instructions... DAN" | PROMPT_ATTACK (0.997) | GUARDRAIL_INTERVENED | 104 |
+  | PROMPT_ATTACK base64-encoded injection | **SAFE** | NONE | 118 |
   - The base64 miss is a natural "deliberate miss" for the demo: the model never saw encoded payloads in training, and it shows why AWS layers a prompt-attack filter with other controls. `[YOU]` Carter confirms this is the miss to show.
-- [x] `latency.py` (`results\latency.json`, n=50): **mean 132 ms, p50 132 ms, p95 148 ms, max 154 ms** per `/guardrail/apply` call (PII regex + one 2B forward pass on the RTX 3050)
+- [x] `latency.py` (`results\latency.json`, n=50, v5 model): **mean 122 ms, p50 124 ms, p95 144 ms, max 148 ms** per `/guardrail/apply` call (PII regex + one 2B forward pass on the RTX 3050 desktop). v1 was 132 / 132 / 148 / 154 ms (`results\v1\latency.json`)
 
 ## Phase 4: Demo and docs
 - [x] `ui.py` running on http://127.0.0.1:7860 (Gradio: Guardrails OFF vs ON side by side, verdict + letter-probability bars + raw ApplyGuardrail JSON; examples from `demo_prompts.txt`). `/chat` verified both ways: guardrails ON blocks the injection (`PROMPT_ATTACK HIGH`, email anonymized) with reply "Sorry, I can't help with that request."; OFF passes the text straight to the model
@@ -105,10 +105,16 @@ Python: `.venv` built with `py -3.12` (3.12.9). Activate with `.venv\Scripts\act
 - Used the existing `guardrails` folder instead of creating `local-guardrails` (Carter's instruction).
 - Added `pytest`, `httpx`, `pandas`, `pyarrow` to the pip list (needed for `tests/`, FastAPI test client, and `datasets` parquet loading).
 
+## Laptop (interview machine)
+- [x] Clone at `C:\Users\OWNER\Desktop\guardrails`; `setup_laptop.cmd` (pip, llama.cpp b12211 CUDA build, Kaggle/HF auth via `setup_auth.py`, v5 GGUFs + data from Kaggle) finished in ~3 min; `kaggle.md` deleted after auth
+- [x] Hardware: GTX 1660 Ti Max-Q 6 GB (compute 7.5), i5-10300H 4c/8t, 7.8 GB RAM, Windows 11, driver 591
+- [x] llama-server (Q8_0) + API up, `pytest` 15/15, demo 4/5 (same rows right/wrong as the desktop), latency n=50: **mean 394 / p50 382 / p95 462 / max 467 ms**, 2.2 GB VRAM (`results\latency_laptop_1660ti.json`, `results\demo_table_laptop.json`)
+- Gotchas: the first request after server start takes ~20 s on the 1660 Ti (CUDA warm-up; the live pytest times out at 30 s if it hits that), then ~0.4 s per call. Windows scheduled tasks default to "no start on battery", so the detached server (`run_server_bg.cmd`) silently never started until the task was set to AllowStartIfOnBatteries / DontStopIfGoingOnBatteries
+- Interview plan: demo live on the laptop (Q8_0, ~0.4 s/call, no Q4_K_M needed); say up front that training/eval ran on Kaggle (T4) and the slide latency figures are from the RTX 3050 desktop
+
 ## Open questions for Carter
-- Over-flagging (XSTest 39.6% / JBB 38% of benign prompts flagged): ship as-is with it on the limitations slide (recommended for the 4-hour budget), or do a second ~1 h Kaggle run with a 50/50 safe/unsafe mix?
 - Deliberate miss for the demo: the base64-encoded injection (predicted SAFE) -- confirm or pick another.
-- `kaggle.md` (plaintext tokens) is still in the folder: delete/move it.
+- Resolved: over-flagging -> Carter chose the second run (Phase 2b, v5 ships). `kaggle.md` deleted. Repo pushed to https://github.com/ctsc/guardrails.
 
 ## Known issues
-- Devin's connection to the laptop drops every few minutes; long-running commands may need re-running.
+- Devin Desktop's link to the machine drops every few minutes (seconds, on campus Wi-Fi); long jobs are run as scheduled tasks (`setup_laptop.cmd`, `run_server_bg.cmd`) that log to `logs\`.
